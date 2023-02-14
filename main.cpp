@@ -16,6 +16,11 @@ int main() {
     scarfyRec.height = scarfy.height; // Height: Spritesheet Height
     scarfyRec.x = 0; // Left
     scarfyRec.y = 0; // Top
+
+    // Animation frame
+    int frame = 0;
+    const float updateTime = 1.0 / 12.0; // Amount of time before we update the animation frame
+    float runningTime = 0;
     
     Vector2 scarfyPos = {windowWidth/2 - scarfyRec.width/2 , windowHeight - scarfyRec.height}; // Position of the sprite (Character)
 
@@ -34,7 +39,7 @@ int main() {
             
             // Delta Time (Time Since Last Frame)
             const float dT = GetFrameTime();
-            
+
             // Ground Check
             if(scarfyPos.y >= windowHeight - scarfyRec.height) 
             {
@@ -53,6 +58,18 @@ int main() {
             
             // Update Y Position
             scarfyPos.y += velocity * dT; // Update the rectangles Y position with the velocity value.
+
+            // Update Animation Frame
+            runningTime += dT; // Update runningTime
+            if(runningTime >= updateTime) {
+                runningTime = 0;
+
+                scarfyRec.x = frame * scarfyRec.width;
+                frame++;
+                if(frame > 5) {
+                    frame = 0;
+                }
+            }
 
             DrawTextureRec(scarfy, scarfyRec, scarfyPos, WHITE);
 
