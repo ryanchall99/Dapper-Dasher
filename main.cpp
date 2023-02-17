@@ -78,13 +78,22 @@ int main() {
 
     int nebVel = -200; // Nebula X Velocity (Pixels / s)
 
+    Texture2D background = LoadTexture("textures/far-buildings.png");
+    float bgX = 0; // Background X Position
+
     while (!WindowShouldClose())
     {
+        // Delta Time (Time Since Last Frame)
+        const float dT = GetFrameTime();
+
         BeginDrawing(); // Begin Drawing
             ClearBackground(WHITE); // Clear background to white each frame (Avoids flashing)
             
-            // Delta Time (Time Since Last Frame)
-            const float dT = GetFrameTime();
+            bgX -= 20 * dT;
+            
+            // Draw Background (Drawn First in draw order)
+            Vector2 bgPos = {bgX, 0.0}; // Background Position
+            DrawTextureEx(background, bgPos, 0, 2, WHITE);
 
             // Ground Check
             if(isGrounded(scarfyData, windowDimensions[1])) 
@@ -135,6 +144,7 @@ int main() {
     
     UnloadTexture(scarfy); // Unloading Texture
     UnloadTexture(nebula); // Unloading Texture
+    UnloadTexture(background);
     CloseWindow(); // Closes Window and unloads OpenGL context
 
     return 0;
