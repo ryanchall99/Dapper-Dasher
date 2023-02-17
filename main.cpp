@@ -1,5 +1,6 @@
 #include "raylib.h"
 
+// Animation Data of texture
 struct AnimData
 {
     Rectangle rec;
@@ -9,6 +10,31 @@ struct AnimData
     float runningTime;
 };
 
+
+bool isGrounded(AnimData data, int windowHeight) 
+{
+    return data.pos.y >= windowHeight - data.rec.height;
+}
+
+AnimData updateAnimData(AnimData data, float deltaTime, int maxFrame) 
+{
+    // update running time
+    data.runningTime += deltaTime;
+    if(data.runningTime >= data.updateTime)
+    {
+        data.runningTime = 0;
+        // Update animation frame
+        data.rec.x = data.frame * data.rec.width;
+        data.frame++;
+
+        if(data.frame > maxFrame)
+        {
+            data.frame = 0;
+        }
+    }
+
+    return data;
+}
 
 int main() {
     // Window
@@ -61,7 +87,7 @@ int main() {
             const float dT = GetFrameTime();
 
             // Ground Check
-            if(scarfyData.pos.y >= windowDimensions[1] - scarfyData.rec.height) 
+            if(isGrounded(scarfyData, windowDimensions[1])) 
             {
                 velocity = 0; // Reset Velocity to 0
                 isInAir = false; // Set isInAir to false (Grounded)
@@ -86,34 +112,14 @@ int main() {
             }
 
             // Update Animation Frame
-            if(!isInAir){
-
-                scarfyData.runningTime += dT; // Update runningTime
-                if(scarfyData.runningTime >= scarfyData.updateTime) {
-                    scarfyData.runningTime = 0;
-                    
-                    scarfyData.rec.x = scarfyData.frame * scarfyData.rec.width;
-
-                    scarfyData.frame++;
-                    
-                    if(scarfyData.frame > 5) {
-                        scarfyData.frame = 0;
-                    }
-                }
+            if(!isInAir)
+            {
+                scarfyData = updateAnimData(scarfyData, dT, 5);
             }
 
             for (int i = 0; i < sizeOfNebulae; i++)
             {
-                nebulae[i].runningTime += dT;
-                if(nebulae[i].runningTime >= nebulae[i].updateTime) {
-                    nebulae[i].runningTime = 0;
-
-                    nebulae[i].rec.x = nebulae[i].frame * nebulae[i].rec.width;
-                    nebulae[i].frame++;
-                    if(nebulae[i].frame > 7) {
-                        nebulae[i].frame = 0;
-                    }
-                }
+                nebulae[i] = updateAnimData(nebulae[i], dT, 7);
             }
             
 
