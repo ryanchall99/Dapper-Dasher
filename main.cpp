@@ -10,12 +10,13 @@ struct AnimData
     float runningTime;
 };
 
-
+// GROUND CHECK FUNCTION
 bool isGrounded(AnimData data, int windowHeight) 
 {
     return data.pos.y >= windowHeight - data.rec.height;
 }
 
+// UPDATE ANIMATION FUNCTION
 AnimData updateAnimData(AnimData data, float deltaTime, int maxFrame) 
 {
     // update running time
@@ -36,6 +37,7 @@ AnimData updateAnimData(AnimData data, float deltaTime, int maxFrame)
     return data;
 }
 
+// UPDATE BACKGROUND SCROLL FUNCTION
 float updateBgScroll(Texture2D tex, float posX, float scrollSpeed, float deltaTime)
 {
     posX -= scrollSpeed * deltaTime;
@@ -91,10 +93,12 @@ int main() {
             0};
     }
 
+    // Finish Line just past final nebula
     float finishLine = nebulae[sizeOfNebulae - 1].pos.x + 120;
 
     int nebVel = -200; // Nebula X Velocity (Pixels / s)
 
+    // BACKGROUND
     Texture2D background = LoadTexture("textures/far-buildings.png");
     float bgX = 0; // Background X Position
     Texture2D midground = LoadTexture("textures/back-buildings.png");
@@ -113,11 +117,12 @@ int main() {
         BeginDrawing(); // Begin Drawing
             ClearBackground(WHITE); // Clear background to white each frame (Avoids flashing)
 
+            // Updating the scrolling background
             bgX = updateBgScroll(background, bgX, 20, dT);
             mgX = updateBgScroll(midground, mgX, 40, dT);
             fgX = updateBgScroll(foreground, fgX, 80, dT);
 
-            // Ground Check
+            // Scarfy Ground Check
             if(isGrounded(scarfyData, windowDimensions[1])) 
             {
                 velocity = 0; // Reset Velocity to 0
@@ -145,6 +150,7 @@ int main() {
             // Update finish line pos
             finishLine += nebVel * dT;
 
+            // ANIMATIONS
             // Update Animation Frame
             if(!isInAir)
             {
@@ -156,6 +162,7 @@ int main() {
                 nebulae[i] = updateAnimData(nebulae[i], dT, 7);
             }
             
+            // COLLISIONS
             // Range based for loop
             for ( AnimData nebula : nebulae )
             {
@@ -183,6 +190,7 @@ int main() {
 
             }
             
+            // FINISHING THE GAME
             if(collision)
             {
                 // Lose the game
@@ -206,11 +214,12 @@ int main() {
         EndDrawing(); // End of Drawing
     }
     
-    UnloadTexture(scarfy); // Unloading Texture
-    UnloadTexture(nebula); // Unloading Texture
-    UnloadTexture(background);
-    UnloadTexture(midground);
-    UnloadTexture(foreground);
+    // TEXTURE UNLOADING
+    UnloadTexture(scarfy); // Unloading Scarfy Texture
+    UnloadTexture(nebula); // Unloading Nebula Texture
+    UnloadTexture(background); // Unloading Background Texture
+    UnloadTexture(midground); // Unloading Midground Texture
+    UnloadTexture(foreground); // Unloading Foreground Texture
     CloseWindow(); // Closes Window and unloads OpenGL context
 
     return 0;
