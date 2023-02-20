@@ -36,6 +36,21 @@ AnimData updateAnimData(AnimData data, float deltaTime, int maxFrame)
     return data;
 }
 
+float updateBgScroll(Texture2D tex, float posX, float scrollSpeed, float deltaTime)
+{
+    posX -= scrollSpeed * deltaTime;
+
+    DrawTextureEx(tex, {posX, 0}, 0, 2, WHITE);
+    DrawTextureEx(tex, {posX + tex.width * 2, 0}, 0, 2, WHITE);
+
+    if(posX <= -tex.width * 2)
+    {
+        posX = 0;
+    }
+
+    return posX;
+}
+
 int main() {
     // Window
     int windowDimensions[2] = {512, 380};
@@ -76,10 +91,16 @@ int main() {
             0};
     }
 
+    float finishLine = nebulae[sizeOfNebulae - 1].pos.x;
+
     int nebVel = -200; // Nebula X Velocity (Pixels / s)
 
     Texture2D background = LoadTexture("textures/far-buildings.png");
     float bgX = 0; // Background X Position
+    Texture2D midground = LoadTexture("textures/back-buildings.png");
+    float mgX = 0;
+    Texture2D foreground = LoadTexture("textures/foreground.png");
+    float fgX = 0;
 
     while (!WindowShouldClose())
     {
@@ -88,12 +109,10 @@ int main() {
 
         BeginDrawing(); // Begin Drawing
             ClearBackground(WHITE); // Clear background to white each frame (Avoids flashing)
-            
-            bgX -= 20 * dT;
-            
-            // Draw Background (Drawn First in draw order)
-            Vector2 bgPos = {bgX, 0.0}; // Background Position
-            DrawTextureEx(background, bgPos, 0, 2, WHITE);
+
+            bgX = updateBgScroll(background, bgX, 20, dT);
+            mgX = updateBgScroll(midground, mgX, 40, dT);
+            fgX = updateBgScroll(foreground, fgX, 80, dT);
 
             // Ground Check
             if(isGrounded(scarfyData, windowDimensions[1])) 
@@ -120,6 +139,9 @@ int main() {
                 nebulae[i].pos.x += nebVel * dT;
             }
 
+            // Update finish line pos
+            finishLine += nebVel * dT;
+
             // Update Animation Frame
             if(!isInAir)
             {
@@ -145,6 +167,8 @@ int main() {
     UnloadTexture(scarfy); // Unloading Texture
     UnloadTexture(nebula); // Unloading Texture
     UnloadTexture(background);
+    UnloadTexture(midground);
+    UnloadTexture(foreground);
     CloseWindow(); // Closes Window and unloads OpenGL context
 
     return 0;
